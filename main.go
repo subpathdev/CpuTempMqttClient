@@ -8,7 +8,7 @@ import (
 	"bytes"
 	"strings"
 
-	"github.com/subpathdev/kubeClient"
+	"github.com/subpathdev/CpuTempMqttClient/kubeClient"
 )
 
 var ipAddress, deviceID, user, password string
