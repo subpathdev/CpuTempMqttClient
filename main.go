@@ -2,8 +2,11 @@ package main
 
 import (
 	"flag"
-	"math/rand"
-	"strconv"
+	"log"
+	"time"
+	"os/exec"
+	"bytes"
+	"strings"
 
 	"./kubeClient"
 )
@@ -23,7 +26,38 @@ func main() {
 	kubeClient.Init(ipAddress, deviceID, user, password)
 	for {
 		var message string
-		message = strconv.Itoa(rand.Int())
+		var out bytes.Buffer
+		var core0 = false
+
+		cmd := exec.Command("sensors -Au")
+		cmd.Stdout = &out
+		cmd.Stderr = &out
+		err := cmd.Start()
+		if err != nil {
+			log.Println("Error in command execution. Error: ", err)
+		}
+		err = cmd.Wait()
+		if err != nil {
+			log.Println("Error by waiting on command execution. Error: ", err)
+		}
+		str := strings.Split(out.String(), "\n");
+
+		for _, element := range str {
+			if core0 == true {
+				if strings.Contains(element, "temp2_input") {
+					val := strings.Split(element, ": ")
+					message = val[1]
+					core0 = false
+				}
+			}
+
+			if strings.Contains(element, "Core 0:") {
+				core0 = true
+			}
+
+		}
+
 		kubeClient.Update(message)
+		time.Sleep(10 * time.Second)
 	}
 }
