@@ -208,4 +208,5 @@ func Init(ipAddress, id, user, password string) {
 	if token_client = client.Connect(); token_client.Wait() && token_client.Error() != nil {
 		log.Println("client.Connect() Error is: ", token_client.Error())
 	}
+	changeSensorStatus("online")
 }
