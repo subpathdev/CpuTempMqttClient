@@ -29,7 +29,7 @@ func main() {
 		var out bytes.Buffer
 		var core0 = false
 
-		cmd := exec.Command("sensors -Au")
+		cmd := exec.Command("/usr/bin/sensors -Au")
 		cmd.Stdout = &out
 		cmd.Stderr = &out
 		err := cmd.Start()
