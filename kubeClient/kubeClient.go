@@ -67,7 +67,7 @@ type DeviceTwinUpdate struct {
 }
 
 var (
-	Prefix = "$hw/events/device"
+	Prefix = "$hw/events/device/"
 	StateUpdateSuffix = "/state/update"
 	TwinUpdateSuffix = "/twin/update"
 	TwinCloudUpdateSuffix = "/twin/cloud_update"
