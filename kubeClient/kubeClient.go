@@ -3,11 +3,11 @@
 package kubeClient
 
 import (
-	"log"
 	"crypto/tls"
+	"encoding/json"
+	"log"
 	"sync"
 	"time"
-	"encoding/json"
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 )
@@ -31,7 +31,12 @@ type BaseMessage struct {
 
 //TwinValue the struct of twin value
 type TwinValue struct {
-	Value    *string	`json:"value, omitempty"`
+	Value    *string        `json:"value, omitempty"`
+	Metadata *ValueMetadata `json:"metadata,omitempty"`
+}
+
+type TwinValueInt struct {
+	Value    *int           `json:"value, omitempty"`
 	Metadata *ValueMetadata `json:"metadata,omitempty"`
 }
 
@@ -53,28 +58,28 @@ type TwinVersion struct {
 
 // MsgTwin the structe of device twin
 type MsgTwin struct {
-	Actual		*TwinValue	`json:"temperature,omitempty"`
-	Optional	*bool		`json:"optional,omitempty"`
-	Metadata	*TypeMetadata	`json:"metadata,omitempty"`
-	ExpectedVersion	*TwinValue	`json:"expected_version,omitempty"`
-	ActualVersion	*TwinVersion	`json:"actual_version,omitempty"`
+	Actual          *TwinValueInt `json:"temperature,omitempty"`
+	Optional        *bool         `json:"optional,omitempty"`
+	Metadata        *TypeMetadata `json:"metadata,omitempty"`
+	ExpectedVersion *TwinValueInt `json:"expected_version,omitempty"`
+	ActualVersion   *TwinVersion  `json:"actual_version,omitempty"`
 }
 
 // DeviceTwinUdpdate the struct of device twin update
 type DeviceTwinUpdate struct {
 	BaseMessage
-	Twin map[string]*MsgTwin	`json:twin"`
+	Twin map[string]*MsgTwin `json:twin"`
 }
 
 var (
-	Prefix = "$hw/events/device/"
-	StateUpdateSuffix = "/state/update"
-	TwinUpdateSuffix = "/twin/update"
+	Prefix                = "$hw/events/device/"
+	StateUpdateSuffix     = "/state/update"
+	TwinUpdateSuffix      = "/twin/update"
 	TwinCloudUpdateSuffix = "/twin/cloud_update"
 	/*
-	 * not needed beacause this programm will not receive any information from the edge / cloud
-	 * TwinGetResultSuffix = "/twin/get/result"
- 	 * TwinGetSuffix = "/twin/get"
+			 * not needed beacause this programm will not receive any information from the edge / cloud
+			 * TwinGetResultSuffix = "/twin/get/result"
+		 	 * TwinGetSuffix = "/twin/get"
 	*/
 )
 
@@ -93,7 +98,7 @@ func mqttConfig(server, clientID, user, password string) *MQTT.ClientOptions {
 			options.SetPassword(password)
 		}
 	}
-	tlsConfig := &tls.Config{InsecureSkipVerify: true, ClientAuth: tls.NoClientCert};
+	tlsConfig := &tls.Config{InsecureSkipVerify: true, ClientAuth: tls.NoClientCert}
 	options.SetTLSConfig(tlsConfig)
 	return options
 }
@@ -115,7 +120,7 @@ func changeSensorStatus(state string) {
 }
 
 // changeTwinValue sends the updated twin value to the edge through the MQTT broker
-func changeTwinValue(updateMessage DeviceTwinUpdate){
+func changeTwinValue(updateMessage DeviceTwinUpdate) {
 	messageBody, err := json.Marshal(updateMessage)
 	if err != nil {
 		log.Println("Error: ", err)
@@ -149,9 +154,17 @@ func syncToCloud(message DeviceTwinUpdate) {
 //}
 
 // createActualUpdateMessage function is used to create the device twin update message
-func createActualUpdateMessage(actualValue string) DeviceTwinUpdate {
+/*func createActualUpdateMessage(actualValue string) DeviceTwinUpdate {
 	var message DeviceTwinUpdate
 	actualMap := map[string]*MsgTwin{"CPU_Temperatur": {Actual: &TwinValue{Value: &actualValue}, Metadata: &TypeMetadata{Type: "Updated"}}}
+	message.Twin = actualMap
+	return message
+}*/
+
+// createActualUpdateMessageInt function is used to create the device twin update message
+func createActualUpdateMessageInt(actualValue int) DeviceTwinUpdate {
+	var message DeviceTwinUpdate
+	actualMap := map[string]*MsgTwin{"CPU_Temperatur": {Actual: &TwinValueInt{Value: &actualValue}, Metadata: &TypeMetadata{Type: "Updated"}}}
 	message.Twin = actualMap
 	return message
 }
@@ -188,9 +201,19 @@ func createActualUpdateMessage(actualValue string) DeviceTwinUpdate {
 // TODO write a function which takes a callback method which will be executed when a message has arrived over MQTT
 
 // Update this function is used to update values on the edge and in the cloud
-func Update(value string) {
+/*func Update(value int) {
 	log.Println("Syncing to edge")
 	updateMessage := createActualUpdateMessage(value)
+	changeTwinValue(updateMessage)
+	time.Sleep(2 * time.Second)
+	log.Println("Syncing to cloud")
+	syncToCloud(updateMessage)
+}*/
+
+// UpdateInt this function is used to update values on the edge and in the cloud
+func UpdateInt(value int) {
+	log.Println("Syncing to edge")
+	updateMessage := createActualUpdateMessageInt(value)
 	changeTwinValue(updateMessage)
 	time.Sleep(2 * time.Second)
 	log.Println("Syncing to cloud")
@@ -199,7 +222,7 @@ func Update(value string) {
 
 // Init hit initalise the MQTT connection and set the used ipAddress and deviceID
 // in a feature version this function also register the callback method to handle incomming messages
-// ipAddress and deviceID has to be set! If you don't want to add an user or an password in the 
+// ipAddress and deviceID has to be set! If you don't want to add an user or an password in the
 // MQTT Connection set user and password to nil
 func Init(ipAddress, id, user, password string) {
 	deviceID = id
