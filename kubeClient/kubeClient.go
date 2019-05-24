@@ -58,7 +58,7 @@ type TwinVersion struct {
 
 // MsgTwin the structe of device twin
 type MsgTwin struct {
-	Actual          *TwinValueInt `json:"temperature,omitempty"`
+	Actual          *TwinValueInt `json:"actual,omitempty"`
 	Optional        *bool         `json:"optional,omitempty"`
 	Metadata        *TypeMetadata `json:"metadata,omitempty"`
 	ExpectedVersion *TwinValueInt `json:"expected_version,omitempty"`
