@@ -68,7 +68,7 @@ type MsgTwin struct {
 // DeviceTwinUdpdate the struct of device twin update
 type DeviceTwinUpdate struct {
 	BaseMessage
-	Twin map[string]*MsgTwin `json:twin"`
+	Twin map[string]*MsgTwin `json:"twin"`
 }
 
 var (
