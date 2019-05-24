@@ -164,8 +164,22 @@ func syncToCloud(message DeviceTwinUpdate) {
 // createActualUpdateMessageInt function is used to create the device twin update message
 func createActualUpdateMessageInt(actualValue int) DeviceTwinUpdate {
 	var message DeviceTwinUpdate
-	actualMap := map[string]*MsgTwin{"CPU_Temperatur": {Actual: &TwinValueInt{Value: &actualValue}, Metadata: &TypeMetadata{Type: "Updated"}}}
+
+	var actual TwinValueInt
+	actual.Value = actualValue
+
+	var meta TypeMetadata
+	meta.Type = "Updated"
+
+	var msg MsgTwin
+	msg.Actual = actual
+	msg.Metadata = meta
+
+	var actualMap map[string]*MsgTwin
+	actualMap["CPU_Temperatur"] = msg
+
 	message.Twin = actualMap
+	message.Timestamp = time.Now().Unix()
 	return message
 }
 
@@ -204,7 +218,7 @@ func createActualUpdateMessageInt(actualValue int) DeviceTwinUpdate {
 /*func Update(value int) {
 	log.Println("Syncing to edge")
 	updateMessage := createActualUpdateMessage(value)
-	changeTwinValue(updateMessage)
+	ghangeTwinValue(updateMessage)
 	time.Sleep(2 * time.Second)
 	log.Println("Syncing to cloud")
 	syncToCloud(updateMessage)
