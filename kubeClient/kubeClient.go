@@ -75,7 +75,7 @@ var (
 	Prefix                = "$hw/events/device/"
 	StateUpdateSuffix     = "/state/update"
 	TwinUpdateSuffix      = "/twin/update"
-	TwinCloudUpdateSuffix = "/twin/cloud_update"
+	TwinCloudUpdateSuffix = "/twin/cloud_updated"
 	/*
 			 * not needed beacause this programm will not receive any information from the edge / cloud
 			 * TwinGetResultSuffix = "/twin/get/result"
