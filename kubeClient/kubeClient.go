@@ -6,6 +6,7 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"log"
+	"strconv"
 	"sync"
 	"time"
 
@@ -53,7 +54,7 @@ type TwinVersion struct {
 
 // MsgTwin the structe of device twin
 type MsgTwin struct {
-	Actual          *TwinValue    `json:"temperature,omitempty"`
+	Actual          *TwinValue    `json:"actual,omitempty"`
 	Optional        *bool         `json:"optional,omitempty"`
 	Metadata        *TypeMetadata `json:"metadata,omitempty"`
 	ExpectedVersion *TwinValue    `json:"expected_version,omitempty"`
@@ -83,6 +84,8 @@ var clientOpts *MQTT.ClientOptions
 var client MQTT.Client
 var wg sync.WaitGroup
 var deviceID string
+
+var eventID int
 
 // mqttConfig crate the mqtt client config
 func mqttConfig(server, clientID, user, password string) *MQTT.ClientOptions {
@@ -153,6 +156,9 @@ func createActualUpdateMessage(actualValue string) DeviceTwinUpdate {
 	var message DeviceTwinUpdate
 	actualMap := map[string]*MsgTwin{"CPU_Temperatur": {Actual: &TwinValue{Value: &actualValue}, Metadata: &TypeMetadata{Type: "string"}}}
 	message.Twin = actualMap
+	message.Timestamp = time.Now().Unix()
+	message.EventID = strconv.Itoa(eventID)
+	eventID++
 	return message
 }
 
@@ -203,6 +209,7 @@ func Update(value string) {
 // MQTT Connection set user and password to nil
 func Init(ipAddress, id, user, password string) {
 	deviceID = id
+	eventID = 0
 	clientOpts = mqttConfig(ipAddress, deviceID, user, password)
 	client = MQTT.NewClient(clientOpts)
 	if token_client = client.Connect(); token_client.Wait() && token_client.Error() != nil {
