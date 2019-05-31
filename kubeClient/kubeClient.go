@@ -35,11 +35,6 @@ type TwinValue struct {
 	Metadata *ValueMetadata `json:"metadata,omitempty"`
 }
 
-type TwinValueInt struct {
-	Value    *int           `json:"value, omitempty"`
-	Metadata *ValueMetadata `json:"metadata,omitempty"`
-}
-
 //ValueMetadata the meta of value
 type ValueMetadata struct {
 	Timestamp int64 `json:"timestamp, omitempty"`
@@ -58,10 +53,10 @@ type TwinVersion struct {
 
 // MsgTwin the structe of device twin
 type MsgTwin struct {
-	Actual          *TwinValueInt `json:"actual,omitempty"`
+	Actual          *TwinValue    `json:"temperature,omitempty"`
 	Optional        *bool         `json:"optional,omitempty"`
 	Metadata        *TypeMetadata `json:"metadata,omitempty"`
-	ExpectedVersion *TwinValueInt `json:"expected_version,omitempty"`
+	ExpectedVersion *TwinValue    `json:"expected_version,omitempty"`
 	ActualVersion   *TwinVersion  `json:"actual_version,omitempty"`
 }
 
@@ -154,32 +149,10 @@ func syncToCloud(message DeviceTwinUpdate) {
 //}
 
 // createActualUpdateMessage function is used to create the device twin update message
-/*func createActualUpdateMessage(actualValue string) DeviceTwinUpdate {
+func createActualUpdateMessage(actualValue string) DeviceTwinUpdate {
 	var message DeviceTwinUpdate
 	actualMap := map[string]*MsgTwin{"CPU_Temperatur": {Actual: &TwinValue{Value: &actualValue}, Metadata: &TypeMetadata{Type: "Updated"}}}
 	message.Twin = actualMap
-	return message
-}*/
-
-// createActualUpdateMessageInt function is used to create the device twin update message
-func createActualUpdateMessageInt(actualValue int) DeviceTwinUpdate {
-	var message DeviceTwinUpdate
-
-	var actual TwinValueInt
-	actual.Value = actualValue
-
-	var meta TypeMetadata
-	meta.Type = "Updated"
-
-	var msg MsgTwin
-	msg.Actual = actual
-	msg.Metadata = meta
-
-	var actualMap map[string]*MsgTwin
-	actualMap["CPU_Temperatur"] = msg
-
-	message.Twin = actualMap
-	message.Timestamp = time.Now().Unix()
 	return message
 }
 
@@ -215,19 +188,9 @@ func createActualUpdateMessageInt(actualValue int) DeviceTwinUpdate {
 // TODO write a function which takes a callback method which will be executed when a message has arrived over MQTT
 
 // Update this function is used to update values on the edge and in the cloud
-/*func Update(value int) {
+func Update(value string) {
 	log.Println("Syncing to edge")
 	updateMessage := createActualUpdateMessage(value)
-	ghangeTwinValue(updateMessage)
-	time.Sleep(2 * time.Second)
-	log.Println("Syncing to cloud")
-	syncToCloud(updateMessage)
-}*/
-
-// UpdateInt this function is used to update values on the edge and in the cloud
-func UpdateInt(value int) {
-	log.Println("Syncing to edge")
-	updateMessage := createActualUpdateMessageInt(value)
 	changeTwinValue(updateMessage)
 	time.Sleep(2 * time.Second)
 	log.Println("Syncing to cloud")
