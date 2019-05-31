@@ -151,7 +151,7 @@ func syncToCloud(message DeviceTwinUpdate) {
 // createActualUpdateMessage function is used to create the device twin update message
 func createActualUpdateMessage(actualValue string) DeviceTwinUpdate {
 	var message DeviceTwinUpdate
-	actualMap := map[string]*MsgTwin{"CPU_Temperatur": {Actual: &TwinValue{Value: &actualValue}, Metadata: &TypeMetadata{Type: "Updated"}}}
+	actualMap := map[string]*MsgTwin{"CPU_Temperatur": {Actual: &TwinValue{Value: &actualValue}, Metadata: &TypeMetadata{Type: "string"}}}
 	message.Twin = actualMap
 	return message
 }
