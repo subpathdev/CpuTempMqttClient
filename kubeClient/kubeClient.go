@@ -72,11 +72,8 @@ var (
 	StateUpdateSuffix     = "/state/update"
 	TwinUpdateSuffix      = "/twin/update"
 	TwinCloudUpdateSuffix = "/twin/cloud_updated"
-	/*
-			 * not needed beacause this programm will not receive any information from the edge / cloud
-			 * TwinGetResultSuffix = "/twin/get/result"
-		 	 * TwinGetSuffix = "/twin/get"
-	*/
+	TwinGetResultSuffix   = "/twin/get/result"
+	TwinGetSuffix         = "/twin/get"
 )
 
 var token_client Token
@@ -143,14 +140,6 @@ func syncToCloud(message DeviceTwinUpdate) {
 	}
 }
 
-// OnSubMessageReceived callback function wich is called when message is received
-//func onSubMessageReceived(client MQTT.Client, message MQTT.Message) {
-//	err := json.Unmarshal(message.Payload(), &deviceTwinResult)
-//	if err != nil {
-//		log.Println("Error in unmarshalling: ", err)
-//	}
-//}
-
 // createActualUpdateMessage function is used to create the device twin update message
 func createActualUpdateMessage(actualValue string) DeviceTwinUpdate {
 	var message DeviceTwinUpdate
@@ -161,37 +150,6 @@ func createActualUpdateMessage(actualValue string) DeviceTwinUpdate {
 	eventID++
 	return message
 }
-
-// getTwin function is used to get the device twin detials from the edge
-//func getTwin(message DeviceTwinUpdate){
-//	topic := Prefix + deviceID + TwinETGetSuffix
-//	messageBody, err := json.Marshal(message)
-//	if err != nil {
-//		log.Println("Error at marshal: ", err)
-//	}
-//	token_client = client.Publish(topic, 0, false, messageBody)
-//	if token_client.Wait() && token_client.Error() != nil {
-//		fmt.Println("client.publsih() Error in get device twin is: ", token_client.Error())
-//	}
-//}
-
-// subscribe function subscribes the device twin information through the MQTT broker
-//func subscribe() {
-//	for {
-//		topic := Prefix + deviceID + TwinETGetResultSuffix
-//		token_client = client.Subscibe(topic, 0, OnSubMessageReceived)
-//		if token_client.Wait() && token_client.Erro() != nil {
-//			log.Println("subscribe() Error in device twin result get is: ", token_client.Error())
-//		}
-//		time.Sleep(1 * time.Second)
-//		if deviceTwinResult.Twin != nil {
-//			wg.Done()
-//			break
-//		}
-//	}
-//}
-
-// TODO write a function which takes a callback method which will be executed when a message has arrived over MQTT
 
 // Update this function is used to update values on the edge and in the cloud
 func Update(value string) {
