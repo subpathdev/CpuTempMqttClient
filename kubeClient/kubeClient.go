@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"log"
 	"strconv"
-	"sync"
+	//"sync"
 	"time"
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
@@ -32,13 +32,13 @@ type BaseMessage struct {
 
 //TwinValue the struct of twin value
 type TwinValue struct {
-	Value    *string        `json:"value, omitempty"`
+	Value    *string        `json:"value,omitempty"`
 	Metadata *ValueMetadata `json:"metadata,omitempty"`
 }
 
 //ValueMetadata the meta of value
 type ValueMetadata struct {
-	Timestamp int64 `json:"timestamp, omitempty"`
+	Timestamp int64 `json:"timestamp,omitempty"`
 }
 
 //TypeMetadata the meta of value type
@@ -79,7 +79,6 @@ var (
 var token_client Token
 var clientOpts *MQTT.ClientOptions
 var client MQTT.Client
-var wg sync.WaitGroup
 var deviceID string
 
 var eventID int

@@ -50,7 +50,7 @@ func main() {
 			str := strings.Split(out.String(), "\n")
 
 			for _, element := range str {
-				if core0 == true {
+				if core0 {
 					if strings.Contains(element, "temp2_input") {
 						val := strings.Split(element, ": ")
 						message = val[1]
