@@ -1,0 +1,18 @@
+---
+apiVersion: devices.kubeedge.io/v1alpha1
+kind: Device
+metadata:
+        name: cpu-sensor-tag01
+        labels:
+                description: CPU-Sensor
+                model: cpu-sensor
+spec:
+        deviceModelRef:
+                name: cpu-sensor
+        nodeSelector:
+                nodeSelectorTerms:
+                        - matchExpressions:
+                                  - key: ''
+                                    operator: IN
+                                    values:
+                                            - edge
