@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"log"
 	"strconv"
-	//"sync"
 	"time"
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
@@ -80,7 +79,6 @@ var token_client Token
 var clientOpts *MQTT.ClientOptions
 var client MQTT.Client
 var deviceID string
-
 var eventID int
 
 // mqttConfig crate the mqtt client config
@@ -160,6 +158,22 @@ func Update(value string) {
 	syncToCloud(updateMessage)
 }
 
+func handleMessage(client MQTT.Client, origMessage MQTT.Message) {
+	topic := origMessage.Topic()
+	message := string(origMessage.Payload())
+
+	log.Printf("Topic of incomming message is: %v\n", topic)
+	log.Printf("Payload of incomming message is: %v\n", message)
+}
+
+func processSubscription(client MQTT.Client) {
+	topic := Prefix + deviceID + "/#"
+	token := client.Subscribe(topic, 0, handleMessage)
+	if token != nil {
+		log.Printf("Error in process subscription: %v", token.Error())
+	}
+}
+
 // Init hit initalise the MQTT connection and set the used ipAddress and deviceID
 // in a feature version this function also register the callback method to handle incomming messages
 // ipAddress and deviceID has to be set! If you don't want to add an user or an password in the
@@ -172,5 +186,6 @@ func Init(ipAddress, id, user, password string) {
 	if token_client = client.Connect(); token_client.Wait() && token_client.Error() != nil {
 		log.Println("client.Connect() Error is: ", token_client.Error())
 	}
+	go processSubscription(client)
 	changeSensorStatus("online")
 }
