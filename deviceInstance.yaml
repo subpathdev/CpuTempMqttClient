@@ -16,3 +16,14 @@ spec:
                                     operator: IN
                                     values:
                                             - edge
+status:
+        twins:
+                - propertyName: CPU_Temperatur
+                  reported:
+                          metadata:
+                                  type: int
+                - propertyName: cpu_id
+                  reported:
+                          value: "0"
+                          metadata:
+                                  type: int
