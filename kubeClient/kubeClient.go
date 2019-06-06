@@ -183,7 +183,7 @@ func handleMessage(client MQTT.Client, origMessage MQTT.Message) {
 func processSubscription(client MQTT.Client) {
 	topic := Prefix + deviceID + "/twin/update/delta"
 	token := client.Subscribe(topic, 0, handleMessage)
-	if token != nil {
+	if token.Error() != nil {
 		log.Printf("Error in process subscription: %v", token.Error())
 	}
 }
