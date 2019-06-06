@@ -54,6 +54,7 @@ type TwinVersion struct {
 // MsgTwin the structe of device twin
 type MsgTwin struct {
 	Actual          *TwinValue    `json:"actual,omitempty"`
+	Expected        *TwinValue    `json:"expected,omitempty"`
 	Optional        *bool         `json:"optional,omitempty"`
 	Metadata        *TypeMetadata `json:"metadata,omitempty"`
 	ExpectedVersion *TwinValue    `json:"expected_version,omitempty"`
@@ -64,6 +65,12 @@ type MsgTwin struct {
 type DeviceTwinUpdate struct {
 	BaseMessage
 	Twin map[string]*MsgTwin `json:"twin"`
+}
+
+type DeviceTwinUpdateDelta struct {
+	BaseMessage
+	Twin  map[string]*MsgTwin `json:"twin"`
+	Delta map[string]string   `json:"delta"`
 }
 
 var (
@@ -80,6 +87,7 @@ var clientOpts *MQTT.ClientOptions
 var client MQTT.Client
 var deviceID string
 var eventID int
+var cpu_id string
 
 // mqttConfig crate the mqtt client config
 func mqttConfig(server, clientID, user, password string) *MQTT.ClientOptions {
@@ -140,7 +148,10 @@ func syncToCloud(message DeviceTwinUpdate) {
 // createActualUpdateMessage function is used to create the device twin update message
 func createActualUpdateMessage(actualValue string) DeviceTwinUpdate {
 	var message DeviceTwinUpdate
-	actualMap := map[string]*MsgTwin{"CPU_Temperatur": {Actual: &TwinValue{Value: &actualValue}, Metadata: &TypeMetadata{Type: "int"}}}
+	actualMap := map[string]*MsgTwin{
+		"CPU_Temperatur": {Actual: &TwinValue{Value: &actualValue}, Metadata: &TypeMetadata{Type: "int"}},
+		"cpu_id":         {Actual: &TwinValue{Value: &cpu_id}, Metadata: &TypeMetadata{Type: "int"}},
+	}
 	message.Twin = actualMap
 	message.Timestamp = time.Now().Unix()
 	message.EventID = strconv.Itoa(eventID)
@@ -159,15 +170,18 @@ func Update(value string) {
 }
 
 func handleMessage(client MQTT.Client, origMessage MQTT.Message) {
-	topic := origMessage.Topic()
-	message := string(origMessage.Payload())
+	var deltaUpdate DeviceTwinUpdateDelta
+	err := json.Unmarshal(origMessage.Payload(), &deltaUpdate)
+	if err != nil {
+		log.Printf("can not unmarshal receive message error is: %v", err)
+		return
+	}
 
-	log.Printf("Topic of incomming message is: %v\n", topic)
-	log.Printf("Payload of incomming message is: %v\n", message)
+	cpu_id = deltaUpdate.Delta["cpu_id"]
 }
 
 func processSubscription(client MQTT.Client) {
-	topic := Prefix + deviceID + "/#"
+	topic := Prefix + deviceID + "/twin/update/delta"
 	token := client.Subscribe(topic, 0, handleMessage)
 	if token != nil {
 		log.Printf("Error in process subscription: %v", token.Error())
@@ -181,6 +195,7 @@ func processSubscription(client MQTT.Client) {
 func Init(ipAddress, id, user, password string) {
 	deviceID = id
 	eventID = 0
+	cpu_id = "0"
 	clientOpts = mqttConfig(ipAddress, deviceID, user, password)
 	client = MQTT.NewClient(clientOpts)
 	if token_client = client.Connect(); token_client.Wait() && token_client.Error() != nil {
