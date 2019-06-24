@@ -36,7 +36,7 @@ func main() {
 		if simulate {
 			message = strconv.Itoa(rand.Intn(200))
 		} else {
-			cmd := exec.Command("/usr/bin/sensors -Au")
+			cmd := exec.Command("/usr/bin/sensors", "-Au")
 			cmd.Stdout = &out
 			cmd.Stderr = &out
 			err := cmd.Start()
