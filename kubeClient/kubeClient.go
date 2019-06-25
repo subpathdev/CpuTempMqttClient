@@ -177,7 +177,10 @@ func handleMessage(client MQTT.Client, origMessage MQTT.Message) {
 		return
 	}
 
-	cpu_id = deltaUpdate.Delta["cpu_id"]
+	if deltaUpdate.Delta["cpu_id"] != "" {
+		cpu_id = deltaUpdate.Delta["cpu_id"]
+	}
+	log.Printf("current delta is: %v", deltaUpdate.Delta)
 }
 
 func processSubscription(client MQTT.Client) {
