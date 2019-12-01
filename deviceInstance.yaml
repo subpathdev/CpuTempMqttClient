@@ -20,7 +20,7 @@ status:
         twins:
                 - propertyName: CPU_Temperatur
                   reported:
-                          value: 0
+                          value: "0"
                           metadata:
                                   type: int
                 - propertyName: cpu_id
