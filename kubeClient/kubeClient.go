@@ -1,5 +1,5 @@
-// Package kubeClient provide the functionality to initalize a MQTT connection and update the device twin
-// in a feauture version this package should also provide to handle incomming message via a callback function
+// Package kubeClient provide the functionality to initialize a MQTT connection and update the device twin
+// in a feature version this package should also provide to handle incoming message via a callback function
 package kubeClient
 
 import (
@@ -89,7 +89,7 @@ var deviceID string
 var eventID int
 var cpu_id string
 
-// mqttConfig crate the mqtt client config
+// mqttConfig creates the mqtt client config
 func mqttConfig(server, clientID, user, password string) *MQTT.ClientOptions {
 	options := MQTT.NewClientOptions().AddBroker(server).SetClientID(clientID).SetCleanSession(true)
 	if user != "" {
@@ -132,7 +132,7 @@ func changeTwinValue(updateMessage DeviceTwinUpdate) {
 	}
 }
 
-// syncToCloud function syncs the updated device twin infromation to the cloud
+// syncToCloud function syncs the updated device twin information to the cloud
 func syncToCloud(message DeviceTwinUpdate) {
 	topic := Prefix + deviceID + TwinCloudUpdateSuffix
 	messageBody, err := json.Marshal(message)
@@ -191,8 +191,8 @@ func processSubscription(client MQTT.Client) {
 	}
 }
 
-// Init hit initalise the MQTT connection and set the used ipAddress and deviceID
-// in a feature version this function also register the callback method to handle incomming messages
+// Init initialize the MQTT connection and set the used ipAddress and deviceID
+// in a feature version this function also register the callback method to handle incoming messages
 // ipAddress and deviceID has to be set! If you don't want to add an user or an password in the
 // MQTT Connection set user and password to nil
 func Init(ipAddress, id, user, password string) {
