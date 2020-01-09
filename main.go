@@ -20,7 +20,7 @@ func init() {
 	//	flag := flag.NewFlagSet("Usage", flag.ExitOnError)
 	flag.StringVar(&mqttURL, "mqttURL", "tcp://127.0.0.1:1884", "URL to the MQTT Broker")
 	flag.StringVar(&deviceID, "deviceID", "43098512438508132096394-a41fcb", "The unique ID of this device (created in the cloud)")
-	flag.StringVar(&user, "user", "", "User to connect to the mqtt broker")
+	flag.StringVar(&user, "user", "", "User to connect to the MQTT broker")
 	flag.StringVar(&password, "password", "", "Password for the MQTT Broker")
 	flag.BoolVar(&simulate, "simulate", false, "if you use this flag the input data will be simulated by random numbers and no sensor will be requested")
 }
