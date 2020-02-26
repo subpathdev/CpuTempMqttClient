@@ -13,21 +13,21 @@ import (
 	"github.com/subpathdev/CpuTempMqttClient/kubeClient"
 )
 
-var ipAddress, deviceID, user, password string
+var mqttURL, deviceID, user, password string
 var simulate bool
 
 func init() {
 	//	flag := flag.NewFlagSet("Usage", flag.ExitOnError)
-	flag.StringVar(&ipAddress, "ipAddress", "tcp://127.0.0.1:1884", "IPAddress with used protocol and port")
+	flag.StringVar(&mqttURL, "mqttURL", "tcp://127.0.0.1:1884", "URL to the MQTT Broker")
 	flag.StringVar(&deviceID, "deviceID", "43098512438508132096394-a41fcb", "The unique ID of this device (created in the cloud)")
-	flag.StringVar(&user, "user", "", "is the user, which should use by the mqtt connection")
-	flag.StringVar(&password, "password", "", "is the password of the MQTT User")
+	flag.StringVar(&user, "user", "", "User to connect to the MQTT broker")
+	flag.StringVar(&password, "password", "", "Password for the MQTT Broker")
 	flag.BoolVar(&simulate, "simulate", false, "if you use this flag the input data will be simulated by random numbers and no sensor will be requested")
 }
 
 func main() {
 	flag.Parse()
-	kubeClient.Init(ipAddress, deviceID, user, password)
+	kubeClient.Init(mqttURL, deviceID, user, password)
 	for {
 		var message string
 		var out bytes.Buffer
